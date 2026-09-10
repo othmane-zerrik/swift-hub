@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Activity;
 use App\Models\Client;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,7 +38,9 @@ class ClientController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        Client::create($validated);
+        $client = Client::create($validated);
+ 
+        Activity::log('client', 'Nouveau client ajouté : ' . $client->name);
 
         return redirect()
             ->route('clients.index')
