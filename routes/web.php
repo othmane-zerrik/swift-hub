@@ -16,6 +16,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\FournisseurController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\ReportController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -100,5 +102,11 @@ Route::resource('fournisseurs', FournisseurController::class)
   
  
 Route::get('/chiffre-affaires', [FinanceController::class, 'index'])->name('finances.index');
+
  
+Route::get('/analytique', [AnalyticsController::class, 'index'])->name('analytics.index');
+
+ 
+Route::get('/rapports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/rapports/export', [ReportController::class, 'exportCsv'])->name('reports.export');
 });

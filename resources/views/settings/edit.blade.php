@@ -319,7 +319,7 @@
                     <span>Dashboard</span>
                 </a>
 
-                <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
+                <a href="{{ route("analytics.index")}}"  class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5M4 19h16M8 19v-6M13 19v-9M18 19v-4" />
                     </svg>
