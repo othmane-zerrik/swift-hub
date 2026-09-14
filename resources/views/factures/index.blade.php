@@ -339,7 +339,7 @@
 
             <p class="side-label">Système</p>
             <div class="space-y-1">
-                <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
+                <a href="{{ route("reports.index")}}" class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h10a1 1 0 0 1 1 1v16l-6-3-6 3V4a1 1 0 0 1 1-1ZM9 8h6M9 11.5h6" /></svg>
                     <span>Rapports</span>
                 </a>

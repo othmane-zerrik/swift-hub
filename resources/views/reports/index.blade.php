@@ -162,17 +162,16 @@
                     </a>
                 </div>
 
-                @if($periode === 'personnalise')
-                    <div class="flex items-center gap-3 mb-6">
-                        <input type="hidden" name="periode" value="personnalise">
-                        <input type="date" name="date_debut" value="{{ request('date_debut', $debut->format('Y-m-d')) }}" class="field-input">
-                        <span style="color: var(--muted);">à</span>
-                        <input type="date" name="date_fin" value="{{ request('date_fin', $fin->format('Y-m-d')) }}" class="field-input">
-                        <button type="submit" class="px-4 py-2 rounded-lg font-semibold text-sm text-white transition hover:opacity-90" style="background: var(--accent);">
-                            Appliquer
-                        </button>
-                    </div>
-                @endif
+              @if($periode === 'personnalise')
+    <div class="flex items-center gap-3 mb-6">
+        <input type="date" name="date_debut" value="{{ request('date_debut', $debut->format('Y-m-d')) }}" class="field-input">
+        <span style="color: var(--muted);">à</span>
+        <input type="date" name="date_fin" value="{{ request('date_fin', $fin->format('Y-m-d')) }}" class="field-input">
+        <button type="submit" name="periode" value="personnalise" class="px-4 py-2 rounded-lg font-semibold text-sm text-white transition hover:opacity-90" style="background: var(--accent);">
+            Appliquer
+        </button>
+    </div>
+@endif
             </form>
 
             <p class="text-sm mb-6" style="color: var(--muted);">
