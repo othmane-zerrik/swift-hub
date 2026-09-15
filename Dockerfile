@@ -1,14 +1,19 @@
 FROM php:8.4-apache
 
-# 1. Installation des dépendances système + Node.js + Extensions PHP
+# 1. Installation des dépendances système + Extensions PHP + fix MPM Apache
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip libzip-dev libpng-dev libonig-dev libicu-dev libxml2-dev \
     libfreetype6-dev libjpeg62-turbo-dev curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) pdo_mysql zip intl gd opcache bcmath \
     && a2enmod rewrite \
-    # Installation de Node.js 20
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && (a2dismod mpm_event || true) \
+    && (a2dismod mpm_worker || true) \
+    && a2enmod mpm_prefork \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# 1b. Installation de Node.js 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
