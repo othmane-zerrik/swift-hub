@@ -27,7 +27,7 @@ COPY composer.json composer.lock ./
 COPY package.json package-lock.json* ./
 
 # 5. Installation des dépendances
-RUN composer install --no-dev --no-autoloader --prefer-dist --optimize-autoloader \
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
     && npm ci
 
 # 6. Copie de TOUT le code source (y compris resources/, vite.config.js, etc.)
@@ -40,9 +40,8 @@ RUN npm run build
 RUN mkdir -p storage/framework/sessions storage/framework/cache storage/framework/views bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache public/build \
     && chmod -R 775 storage bootstrap/cache \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+    && test -f public/build/manifest.json \
+    && test -f vendor/autoload.php
 
 ENV PORT=${PORT:-8080}
 
