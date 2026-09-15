@@ -1,62 +1,53 @@
-# ---------------------------------------------------------
-# ÉTAPE 1 : BUILD FRONTEND (Node.js)
-# ---------------------------------------------------------
-FROM node:20-alpine AS frontend
+FROM php:8.4-apache
 
-WORKDIR /app
+# 1. Installation des dépendances système + Node.js + Extensions PHP
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git unzip libzip-dev libpng-dev libonig-dev libicu-dev libxml2-dev \
+    libfreetype6-dev libjpeg62-turbo-dev curl \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) pdo_mysql zip intl gd opcache bcmath \
+    && a2enmod rewrite \
+    # Installation de Node.js 20
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 1. Copie uniquement les fichiers essentiels pour npm install
-COPY package*.json ./
-COPY vite.config.js ./
-
-# 2. Copie des dossiers sources nécessaires au build
-COPY resources ./resources
-COPY public ./public
-
-# 3. Installation et Build (Vite détectera automatiquement tailwind/postcss s'ils existent dans package.json)
-RUN npm ci
-RUN npm run build
-
-# ---------------------------------------------------------
-# ÉTAPE 2 : APPLICATION PHP (Production)
-# ---------------------------------------------------------
-FROM php:8.4-apache-bookworm
+# 2. Installation de Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Installation des dépendances système
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    libzip-dev \
-    && docker-php-ext-configure gd --with-freetype \
-    && docker-php-ext-install -j$(nproc) pdo_mysql mbstring exif pcntl bcmath gd zip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# 3. Configuration Apache pour pointer vers /public
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Installation de Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# 4. Copie des fichiers de dépendances d'abord (pour utiliser le cache Docker)
+COPY composer.json composer.lock ./
+COPY package.json package-lock.json* ./
 
-# Copie du code source Laravel
+# 5. Installation des dépendances
+RUN composer install --no-dev --no-autoloader --prefer-dist --optimize-autoloader \
+    && npm ci
+
+# 6. Copie de TOUT le code source (y compris resources/, vite.config.js, etc.)
 COPY . .
 
-# COPIE CRUCIALE : Récupération du build généré par l'étape Node
-COPY --from=frontend /app/public/build ./public/build
+# 7. BUILD VITE (C'est ici que le manifest.json est créé)
+RUN npm run build
 
-# Permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+# 8. Permissions et caches
+RUN mkdir -p storage/framework/sessions storage/framework/cache storage/framework/views bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache public/build \
+    && chmod -R 775 storage bootstrap/cache \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
-# Configuration Apache
-RUN a2enmod rewrite \
-    && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
-    && echo "<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>" >> /etc/apache2/apache2.conf
+ENV PORT=${PORT:-8080}
 
-EXPOSE 80
-
-CMD ["sh", "-c", "php artisan migrate --force && apache2-foreground"]
+# 9. Démarrage
+CMD sh -c 'sed -i "s/Listen 80/Listen ${PORT}/g" /etc/apache2/ports.conf && \
+    sed -i "s/:80>/:${PORT}>/g" /etc/apache2/sites-available/000-default.conf && \
+    php artisan migrate --force && \
+    apache2-foreground'
