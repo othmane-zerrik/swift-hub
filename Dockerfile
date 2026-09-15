@@ -21,7 +21,8 @@ WORKDIR /var/www/html
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
+RUN printf '<Directory /var/www/html/public>\n\tAllowOverride All\n</Directory>\n' > /etc/apache2/conf-available/z-laravel.conf \
+    && a2enconf z-laravel
 # 4. Copie des fichiers de dépendances d'abord (pour utiliser le cache Docker)
 COPY composer.json composer.lock ./
 COPY package.json package-lock.json* ./
