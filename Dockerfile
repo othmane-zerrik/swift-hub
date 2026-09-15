@@ -1,37 +1,57 @@
-FROM php:8.4-cli
 
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libzip-dev \
-    libonig-dev \
-    && docker-php-ext-install pdo_mysql zip mbstring \
-    && rm -rf /var/lib/apt/lists/*
+FROM node:20-alpine AS frontend
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+WORKDIR /app
+
+COPY package*.json ./
+COPY vite.config.js ./
+COPY tailwind.config.js ./ 2>/dev/null || true
+COPY postcss.config.js ./ 2>/dev/null || true
+COPY resources ./resources
+COPY public ./public
+
+RUN npm ci
+RUN npm run build
+
+
+FROM php:8.4-apache
 
 WORKDIR /var/www/html
 
-# Installer les dépendances avant de copier tout le projet
-COPY composer.json composer.lock ./
 
-# --no-scripts est important ici : artisan n'est pas encore copié
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copier maintenant le projet Laravel
+# Installation de Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copie du code source Laravel
 COPY . .
 
-# Générer l'autoload après avoir copié artisan et les fichiers Laravel
-RUN composer dump-autoload --optimize --no-dev
 
-RUN chmod -R 775 storage bootstrap/cache
+COPY --from=frontend /app/public/build ./public/build
 
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# Permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
 
-EXPOSE 8000
+# Configuration Apache pour Laravel (DocumentRoot sur public/)
+RUN a2enmod rewrite \
+    && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
+    && echo "<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>" >> /etc/apache2/apache2.conf
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+EXPOSE 80
 
+# Démarrage
+CMD ["sh", "-c", "php artisan migrate --force && apache2-foreground"]
 
 
