@@ -5,29 +5,26 @@ FROM node:20-alpine AS frontend
 
 WORKDIR /app
 
-# Copie des fichiers de dépendances
+# 1. Copie uniquement les fichiers essentiels pour npm install
 COPY package*.json ./
 COPY vite.config.js ./
-COPY tailwind.config.js ./ 2>/dev/null || true
-COPY postcss.config.js ./ 2>/dev/null || true
 
-# Copie des sources
+# 2. Copie des dossiers sources nécessaires au build
 COPY resources ./resources
 COPY public ./public
 
-# Installation et Build
+# 3. Installation et Build (Vite détectera automatiquement tailwind/postcss s'ils existent dans package.json)
 RUN npm ci
 RUN npm run build
 
 # ---------------------------------------------------------
 # ÉTAPE 2 : APPLICATION PHP (Production)
 # ---------------------------------------------------------
-# Utilisation d'une image basée sur Debian Bookworm (plus stable que Trixie parfois)
 FROM php:8.4-apache-bookworm
 
 WORKDIR /var/www/html
 
-# Mise à jour sécurisée et installation des paquets système
+# Installation des dépendances système
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
@@ -44,10 +41,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copie du code source
+# Copie du code source Laravel
 COPY . .
 
-# Copie CRUCIALE du build frontend vers le dossier public
+# COPIE CRUCIALE : Récupération du build généré par l'étape Node
 COPY --from=frontend /app/public/build ./public/build
 
 # Permissions
@@ -55,7 +52,7 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
-# Configuration Apache pour Laravel
+# Configuration Apache
 RUN a2enmod rewrite \
     && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
     && echo "<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>" >> /etc/apache2/apache2.conf
