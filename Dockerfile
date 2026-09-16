@@ -1,24 +1,25 @@
 FROM php:8.4-apache
 
+# 1. Dépendances + Nettoyage FORCE des MPM Apache (AH00534 fix)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip libzip-dev libpng-dev libonig-dev libicu-dev libxml2-dev \
     libfreetype6-dev libjpeg62-turbo-dev curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" \
-        pdo_mysql zip intl gd opcache bcmath \
-    && a2dismod mpm_event mpm_worker mpm_prefork || true \
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql zip intl gd opcache bcmath \
+    # FIX RADICAL POUR L'ERREUR MPM : Supprime tous les MPM puis active prefork
+    && rm -f /etc/apache2/mods-enabled/mpm_* \
     && a2enmod mpm_prefork rewrite \
-    && apache2ctl configtest \
-    && apache2ctl -M | grep mpm \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# 2. Node.js 20
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get update \
     && apt-get install -y --no-install-recommends nodejs \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# 3. Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
@@ -40,6 +41,7 @@ RUN printf '<Directory /var/www/html/public>\n\
     > /etc/apache2/conf-available/z-laravel.conf \
     && a2enconf z-laravel
 
+# 4. Copie des fichiers de dépendances
 COPY composer.json composer.lock ./
 COPY package.json package-lock.json* ./
 
@@ -52,12 +54,13 @@ RUN composer install \
 
 RUN npm ci
 
+# 5. Copie du code source + Build Vite
 COPY . .
 
 RUN composer dump-autoload --optimize --no-dev
-
 RUN npm run build
 
+# 6. Dossiers et Permissions
 RUN mkdir -p \
         storage/framework/sessions \
         storage/framework/cache \
@@ -72,13 +75,12 @@ RUN mkdir -p \
     && test -f vendor/autoload.php
 
 ENV PORT=8080
-
 EXPOSE 8080
 
+# 7. Démarrage
 CMD ["sh", "-c", "\
     sed -i \"s/^Listen .*/Listen ${PORT}/\" /etc/apache2/ports.conf && \
     sed -i \"s/<VirtualHost \\*:80>/<VirtualHost *:${PORT}>/\" /etc/apache2/sites-available/000-default.conf && \
-    apache2ctl configtest && \
     php artisan migrate --force && \
     exec apache2-foreground \
 "]
