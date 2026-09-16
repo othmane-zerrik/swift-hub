@@ -39,6 +39,8 @@
                 50% { transform: translateY(-10px); }
             }
         </style>
+        
+
     </head>
     <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 min-h-screen relative overflow-x-hidden bg-grid-pattern selection:bg-red-600 selection:text-white">
         
