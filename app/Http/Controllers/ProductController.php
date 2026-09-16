@@ -42,7 +42,7 @@ class ProductController extends Controller
             'description' => ['nullable', 'string'],
         ]);
 
-        Product::create($validated);
+    
 
         $product = Product::create($validated);
  
