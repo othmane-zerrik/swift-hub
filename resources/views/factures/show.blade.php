@@ -69,6 +69,11 @@
             <button type="submit" class="px-4 py-2 rounded-lg text-sm font-semibold transition hover:bg-[var(--hover)]" style="color: var(--accent);">
                 Supprimer
             </button>
+            <a href="{{ route('factures.pdf', $facture) }}"
+   class="px-4 py-2 rounded-lg text-sm font-semibold text-white transition hover:opacity-90"
+   style="background: var(--accent);">
+    Télécharger PDF
+</a>
         </form>
     </div>
 

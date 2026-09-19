@@ -56,9 +56,13 @@
 </head>
 
 <body class="text-[16px]">
-
+    
 <div class="max-w-3xl mx-auto p-8">
-
+     @if(session('error'))
+        <div class="rounded-xl p-4 mb-6" style="background: var(--accent-soft); border: 1px solid #F5C2C2;">
+            <p class="font-semibold text-sm" style="color: var(--accent);">{{ session('error') }}</p>
+        </div>
+    @endif
     {{-- HEADER --}}
     <div class="flex items-start justify-between mb-8">
         <div>
@@ -68,6 +72,7 @@
                 </svg>
                 Retour aux devis
             </a>
+        
             <div class="flex items-center gap-3">
                 <h2 class="text-2xl font-extrabold tracking-tight font-mono">{{ $devis->numero }}</h2>
                 <span class="badge badge-{{ $devis->statut }}">
@@ -128,6 +133,7 @@
                     <p class="font-bold" style="color: #16A34A;">Devis accepté</p>
                     <p class="text-sm mt-1" style="color: #166534;">Transforme-le en facture pour finaliser la vente.</p>
                 </div>
+                
                 <form method="POST" action="{{ route('devis.facturer', $devis) }}">
                     @csrf
                     <button type="submit" class="px-5 py-2.5 rounded-xl font-semibold text-sm text-white transition hover:opacity-90" style="background: #16A34A;">

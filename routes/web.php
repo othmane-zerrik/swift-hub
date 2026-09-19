@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
     ]);
 })->name('dashboard');
  
-
+Route::get('/factures/{facture}/pdf', [FactureController::class, 'downloadPdf'])->name('factures.pdf');
     Route::resource('clients', ClientController::class)
         ->only(['index', 'store', 'update', 'destroy']);
 
