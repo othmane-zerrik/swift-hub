@@ -257,8 +257,18 @@
 
 <div class="flex min-h-screen">
 
+    {{-- Bouton menu (mobile uniquement) --}}
+    <button onclick="openSidebar()" class="lg:hidden fixed top-4 left-4 z-30 w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--surface); border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+
+    {{-- Fond sombre quand le menu est ouvert (mobile) --}}
+    <div id="sidebar-overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/40 z-40 hidden"></div>
+
     {{-- SIDEBAR --}}
-    <aside class="w-64 flex flex-col fixed inset-y-0 left-0 overflow-y-auto" style="background: var(--surface); border-right: 1px solid var(--border); z-index: 10;">
+    <aside id="sidebar" class="w-64 flex flex-col fixed inset-y-0 left-0 overflow-y-auto -translate-x-full lg:translate-x-0 transition-transform duration-300" style="background: var(--surface); border-right: 1px solid var(--border); z-index: 50;">
 
         {{-- Logo --}}
         <div class="h-20 flex items-center px-7 border-b gap-3" style="border-color: var(--border);">
@@ -365,7 +375,7 @@
 
 
     {{-- CONTENU PRINCIPAL --}}
-    <main class="flex-1 ml-64">
+    <main class="flex-1 lg:ml-64">
 
         {{-- HEADER --}}
         <header class="topbar px-8 py-4 flex items-center justify-between">
@@ -491,6 +501,15 @@
     </main>
 
 </div>
-
+<script>
+    function openSidebar() {
+        document.getElementById('sidebar').classList.remove('-translate-x-full');
+        document.getElementById('sidebar-overlay').classList.remove('hidden');
+    }
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.add('-translate-x-full');
+        document.getElementById('sidebar-overlay').classList.add('hidden');
+    }
+</script>
 </body>
 </html>
