@@ -17,6 +17,7 @@ class ReportController extends Controller
     public function index(Request $request): View
     {
         $periode = $request->query('periode', 'ce_mois');
+
         [$debut, $fin] = $this->resoudrePeriode($periode, $request);
 
         $factures = $this->facturesPourPeriode($debut, $fin);
@@ -33,26 +34,30 @@ class ReportController extends Controller
     }
 
     /**
-     * Exporte le même rapport en fichier CSV téléchargeable.
+     * Exporte le rapport de l'utilisateur connecté en CSV.
      */
     public function exportCsv(Request $request): StreamedResponse
     {
         $periode = $request->query('periode', 'ce_mois');
+
         [$debut, $fin] = $this->resoudrePeriode($periode, $request);
 
         $factures = $this->facturesPourPeriode($debut, $fin);
 
         $nomFichier = 'rapport_ventes_'
-            . $debut->format('Y-m-d') . '_'
-            . $fin->format('Y-m-d') . '.csv';
+            . $debut->format('Y-m-d')
+            . '_'
+            . $fin->format('Y-m-d')
+            . '.csv';
 
         $callback = function () use ($factures) {
+
             $handle = fopen('php://output', 'w');
 
-            // BOM UTF-8 → accents corrects dans Excel
+            // BOM UTF-8 pour Excel
             fwrite($handle, "\xEF\xBB\xBF");
 
-            // Force le séparateur ";" (ignore les paramètres régionaux d'Excel)
+            // Séparateur Excel
             fwrite($handle, "SEP=;\r\n");
 
             // En-têtes
@@ -65,45 +70,72 @@ class ReportController extends Controller
                 'Total TTC (DH)',
             ], ';');
 
-            // Lignes
+            // Factures de l'utilisateur connecté uniquement
             foreach ($factures as $facture) {
+
                 fputcsv($handle, [
                     $facture->numero,
                     $facture->client->name ?? 'Client supprimé',
                     $facture->date_facture->format('d/m/Y'),
                     $this->libelleStatut($facture->statut),
-                    // Pas d'espace de milliers → Excel lit un vrai nombre
-                    number_format((float) $facture->total_ht, 2, ',', ''),
-                    number_format((float) $facture->total_ttc, 2, ',', ''),
+                    number_format(
+                        (float) $facture->total_ht,
+                        2,
+                        ',',
+                        ''
+                    ),
+                    number_format(
+                        (float) $facture->total_ttc,
+                        2,
+                        ',',
+                        ''
+                    ),
                 ], ';');
             }
 
-            // Ligne TOTAL
+            // Total
             fputcsv($handle, [
                 '',
                 '',
                 '',
                 'TOTAL',
-                number_format((float) $factures->sum('total_ht'), 2, ',', ''),
-                number_format((float) $factures->sum('total_ttc'), 2, ',', ''),
+                number_format(
+                    (float) $factures->sum('total_ht'),
+                    2,
+                    ',',
+                    ''
+                ),
+                number_format(
+                    (float) $factures->sum('total_ttc'),
+                    2,
+                    ',',
+                    ''
+                ),
             ], ';');
 
             fclose($handle);
         };
 
-        return response()->streamDownload($callback, $nomFichier, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-        ]);
+        return response()->streamDownload(
+            $callback,
+            $nomFichier,
+            [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]
+        );
     }
 
-    /* ────────────────── Méthodes privées ────────────────── */
-
     /**
-     * Requête commune aux deux actions.
+     * Récupère uniquement les factures appartenant
+     * à l'utilisateur connecté.
      */
-    private function facturesPourPeriode(Carbon $debut, Carbon $fin): Collection
-    {
+    private function facturesPourPeriode(
+        Carbon $debut,
+        Carbon $fin
+    ): Collection {
+
         return Facture::with('client')
+            ->where('user_id', auth()->id())
             ->whereBetween('date_facture', [$debut, $fin])
             ->orderBy('date_facture')
             ->get();
@@ -123,26 +155,42 @@ class ReportController extends Controller
     }
 
     /**
-     * Convertit le nom de période (ou des dates personnalisées) en date de début/fin.
-     *
-     * @return array{0: Carbon, 1: Carbon}
+     * Convertit le nom de période en date de début et de fin.
      */
-    private function resoudrePeriode(string $periode, Request $request): array
-    {
+    private function resoudrePeriode(
+        string $periode,
+        Request $request
+    ): array {
+
         return match ($periode) {
+
             'mois_dernier' => [
                 now()->subMonthNoOverflow()->startOfMonth(),
                 now()->subMonthNoOverflow()->endOfMonth(),
             ],
+
             'cette_annee' => [
                 now()->startOfYear(),
                 now()->endOfYear(),
             ],
+
             'personnalise' => [
-                Carbon::parse($request->query('date_debut', now()->startOfMonth()->toDateString())),
-                Carbon::parse($request->query('date_fin', now()->toDateString())),
+                Carbon::parse(
+                    $request->query(
+                        'date_debut',
+                        now()->startOfMonth()->toDateString()
+                    )
+                ),
+
+                Carbon::parse(
+                    $request->query(
+                        'date_fin',
+                        now()->toDateString()
+                    )
+                ),
             ],
-            default => [ // 'ce_mois'
+
+            default => [
                 now()->startOfMonth(),
                 now()->endOfMonth(),
             ],

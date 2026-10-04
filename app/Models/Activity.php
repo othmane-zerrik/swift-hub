@@ -10,6 +10,7 @@ class Activity extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'type',
         'description',
     ];
@@ -19,12 +20,13 @@ class Activity extends Model
      * Utilisation : Activity::log('client', 'Nouveau client ajouté : Karim');
      */
     public static function log(string $type, string $description): self
-    {
-        return static::create([
-            'type'        => $type,
-            'description' => $description,
-        ]);
-    }
+{
+    return static::create([
+        'user_id'     => auth()->id(),
+        'type'        => $type,
+        'description' => $description,
+    ]);
+}
 
     /**
      * Renvoie le nom de l'icône SVG à utiliser selon le type.
@@ -40,4 +42,8 @@ class Activity extends Model
             default   => 'dot',
         };
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

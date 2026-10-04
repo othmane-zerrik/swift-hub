@@ -15,6 +15,7 @@ class Employee extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',
         'name',
         'email',
         'phone',
@@ -32,4 +33,8 @@ class Employee extends Model
         'salary'    => 'decimal:2',
         'hire_date' => 'date',
     ];
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

@@ -14,6 +14,7 @@ class Facture extends Model
     protected $table = 'factures';
 
     protected $fillable = [
+        'user_id',
         'numero',
         'client_id',
         'devis_id',
@@ -115,4 +116,8 @@ class Facture extends Model
 
         return $facture;
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

@@ -15,6 +15,7 @@ class Devis extends Model
     protected $table = 'devis';
 
     protected $fillable = [
+        'user_id',
         'numero',
         'client_id',
         'date_devis',
@@ -67,4 +68,8 @@ class Devis extends Model
 
         return sprintf('DEV-%s-%04d', $annee, $dernier + 1);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

@@ -30,20 +30,26 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
+Route::middleware('signed')->group(function () {
+    Route::get('/devis/{devis}/consulter', [DevisController::class, 'consulter'])->name('devis.consulter');
+    Route::get('/devis/{devis}/accepter', [DevisController::class, 'accepter'])->name('devis.accepter');
+    Route::get('/devis/{devis}/refuser', [DevisController::class, 'refuser'])->name('devis.refuser');
+});
 
 // --- Tout ce qui nécessite d'être connecté ---
 Route::middleware('auth')->group(function () {
 
-   Route::get('/dashboard', function () {
-    return view('dashboard', [
-        'clientsCount'   => Client::count(),
-        'productsCount'  => Product::count(),
-        'devisCount'     => Devis::count(),
-        'facturesCount'  => Facture::count(),
-        'activities'     => Activity::latest()->take(5)->get(),
-    ]);
-})->name('dashboard');
+    Route::get('/dashboard', function () {
+        $userId = auth()->id();
+
+        return view('dashboard', [
+            'clientsCount'  => Client::where('user_id', $userId)->count(),
+            'productsCount' => Product::where('user_id', $userId)->count(),
+            'devisCount'    => Devis::where('user_id', $userId)->count(),
+            'facturesCount' => Facture::where('user_id', $userId)->count(),
+            'activities'    => Activity::where('user_id', $userId)->latest()->take(5)->get(),
+        ]);
+    })->name('dashboard');
  
 Route::get('/factures/{facture}/pdf', [FactureController::class, 'downloadPdf'])->name('factures.pdf');
     Route::resource('clients', ClientController::class)
@@ -69,11 +75,7 @@ Route::get('/factures/{facture}/pdf', [FactureController::class, 'downloadPdf'])
 // Ces 3 routes sont PUBLIQUES : pas besoin d'être connecté, mais protégées
 // par une signature cryptographique (impossible à deviner/falsifier).
  
-Route::middleware('signed')->group(function () {
-    Route::get('/devis/{devis}/consulter', [DevisController::class, 'consulter'])->name('devis.consulter');
-    Route::get('/devis/{devis}/accepter', [DevisController::class, 'accepter'])->name('devis.accepter');
-    Route::get('/devis/{devis}/refuser', [DevisController::class, 'refuser'])->name('devis.refuser');
-});
+
  
 Route::get('/factures', [FactureController::class, 'index'])->name('factures.index');
 Route::get('/factures/create', [FactureController::class, 'create'])->name('factures.create');

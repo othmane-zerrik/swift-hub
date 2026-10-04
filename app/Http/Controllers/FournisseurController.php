@@ -14,12 +14,16 @@ class FournisseurController extends Controller
      */
     public function index(Request $request): View
     {
+        $userId = auth()->id();
         $search = $request->query('search');
 
-        $fournisseurs = Fournisseur::when($search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
+        $fournisseurs = Fournisseur::where('user_id', $userId)
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%")
                       ->orWhere('city', 'like', "%{$search}%");
+                });
             })
             ->latest()
             ->get();
@@ -32,6 +36,8 @@ class FournisseurController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $userId = auth()->id();
+
         $validated = $request->validate([
             'name'  => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
@@ -40,7 +46,14 @@ class FournisseurController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        Fournisseur::create($validated);
+        Fournisseur::create([
+            'user_id' => $userId,
+            'name'    => $validated['name'],
+            'email'   => $validated['email'] ?? null,
+            'phone'   => $validated['phone'] ?? null,
+            'city'    => $validated['city'] ?? null,
+            'notes'   => $validated['notes'] ?? null,
+        ]);
 
         return redirect()
             ->route('fournisseurs.index')
@@ -52,6 +65,11 @@ class FournisseurController extends Controller
      */
     public function update(Request $request, Fournisseur $fournisseur): RedirectResponse
     {
+        $userId = auth()->id();
+
+        $fournisseur = Fournisseur::where('user_id', $userId)
+            ->findOrFail($fournisseur->id);
+
         $validated = $request->validate([
             'name'  => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
@@ -72,6 +90,9 @@ class FournisseurController extends Controller
      */
     public function destroy(Fournisseur $fournisseur): RedirectResponse
     {
+        $fournisseur = Fournisseur::where('user_id', auth()->id())
+            ->findOrFail($fournisseur->id);
+
         $fournisseur->delete();
 
         return redirect()

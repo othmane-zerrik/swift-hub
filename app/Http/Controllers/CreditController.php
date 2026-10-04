@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Credit;
+use App\Models\Fournisseur;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class CreditController extends Controller
@@ -15,9 +17,11 @@ class CreditController extends Controller
      */
     public function index(Request $request): View
     {
-        $type = $request->query('type'); // 'client', 'fournisseur', ou vide = tous
+        $userId = auth()->id();
+        $type = $request->query('type');
 
-        $credits = Credit::when($type, fn ($query, $type) => $query->where('type', $type))
+        $credits = Credit::where('user_id', $userId)
+            ->when($type, fn ($query, $type) => $query->where('type', $type))
             ->orderBy('date_echeance')
             ->get();
 
@@ -27,34 +31,67 @@ class CreditController extends Controller
     /**
      * Formulaire de création d'un crédit.
      */
-    
+    public function create(): View
+    {
+        $userId = auth()->id();
+
+        $clients = Client::where('user_id', $userId)
+            ->orderBy('name')
+            ->get();
+
+        $fournisseurs = Fournisseur::where('user_id', $userId)
+            ->orderBy('name')
+            ->get();
+
+        return view('credits.create', compact('clients', 'fournisseurs'));
+    }
 
     /**
      * Enregistrer un nouveau crédit.
      */
     public function store(Request $request): RedirectResponse
     {
-          $validated = $request->validate([
-            'type'           => ['required', 'in:client,fournisseur'],
-            'client_id'      => ['nullable', 'required_if:type,client', 'exists:clients,id'],
-            'fournisseur_id' => ['nullable', 'required_if:type,fournisseur', 'exists:fournisseurs,id'],
-            'montant'        => ['required', 'numeric', 'min:0.01'],
-            'date_credit'    => ['required', 'date'],
-            'date_echeance'  => ['required', 'date', 'after_or_equal:date_credit'],
-            'notes'          => ['nullable', 'string'],
+        $userId = auth()->id();
+
+        $validated = $request->validate([
+            'type' => ['required', 'in:client,fournisseur'],
+            'client_id' => [
+                'nullable',
+                'required_if:type,client',
+                Rule::exists('clients', 'id')->where(fn ($query) => $query->where('user_id', $userId)),
+            ],
+            'fournisseur_id' => [
+                'nullable',
+                'required_if:type,fournisseur',
+                Rule::exists('fournisseurs', 'id')->where(fn ($query) => $query->where('user_id', $userId)),
+            ],
+            'montant' => ['required', 'numeric', 'min:0.01'],
+            'date_credit' => ['required', 'date'],
+            'date_echeance' => ['required', 'date', 'after_or_equal:date_credit'],
+            'notes' => ['nullable', 'string'],
         ]);
- 
+
         if ($validated['type'] === 'client') {
-            $client = \App\Models\Client::findOrFail($validated['client_id']);
+            $client = Client::where('user_id', $userId)->findOrFail($validated['client_id']);
             $validated['tiers_nom'] = $client->name;
             $validated['fournisseur_id'] = null;
         } else {
-            $fournisseur = \App\Models\Fournisseur::findOrFail($validated['fournisseur_id']);
+            $fournisseur = Fournisseur::where('user_id', $userId)->findOrFail($validated['fournisseur_id']);
             $validated['tiers_nom'] = $fournisseur->name;
             $validated['client_id'] = null;
         }
- 
-        Credit::create($validated);
+
+        Credit::create([
+            'user_id' => $userId,
+            'type' => $validated['type'],
+            'client_id' => $validated['client_id'] ?? null,
+            'fournisseur_id' => $validated['fournisseur_id'] ?? null,
+            'tiers_nom' => $validated['tiers_nom'],
+            'montant' => $validated['montant'],
+            'date_credit' => $validated['date_credit'],
+            'date_echeance' => $validated['date_echeance'],
+            'notes' => $validated['notes'] ?? null,
+        ]);
 
         return redirect()
             ->route('credits.index')
@@ -66,6 +103,8 @@ class CreditController extends Controller
      */
     public function enregistrerPaiement(Request $request, Credit $credit): RedirectResponse
     {
+        $credit = Credit::where('user_id', auth()->id())->findOrFail($credit->id);
+
         $validated = $request->validate([
             'montant_paiement' => ['required', 'numeric', 'min:0.01', 'max:' . $credit->montant_restant],
         ]);
@@ -84,17 +123,12 @@ class CreditController extends Controller
      */
     public function destroy(Credit $credit): RedirectResponse
     {
+        $credit = Credit::where('user_id', auth()->id())->findOrFail($credit->id);
+
         $credit->delete();
 
         return redirect()
             ->route('credits.index')
             ->with('success', 'Crédit supprimé.');
-    }
-    public function create(): View
-    {
-        $clients = Client::orderBy('name')->get();
-        $fournisseurs = \App\Models\Fournisseur::orderBy('name')->get();
- 
-        return view('credits.create', compact('clients', 'fournisseurs'));
     }
 }

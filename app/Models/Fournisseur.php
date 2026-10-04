@@ -11,6 +11,7 @@ class Fournisseur extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'name',
         'email',
         'phone',
@@ -33,4 +34,8 @@ class Fournisseur extends Model
     {
         return $this->hasMany(Credit::class);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

@@ -12,6 +12,7 @@ class Credit extends Model
 
   
     protected $fillable = [
+        'user_id',
         'type',
         'tiers_nom',
         'client_id',
@@ -74,4 +75,8 @@ class Credit extends Model
     {
         return $this->belongsTo(Fournisseur::class);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

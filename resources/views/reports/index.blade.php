@@ -35,6 +35,147 @@
         .badge-en_attente { background: var(--amber-soft); color: var(--amber); }
         .badge-payee { background: var(--green-soft); color: var(--green); }
         .badge-en_retard { background: var(--accent-soft); color: var(--accent); }
+           :root {
+            --ink: #0A0A0A;
+            --bg: #F7F7F5;
+            --surface: #FFFFFF;
+            --surface-soft: #FDFDFC;
+            --border: #E9E9E5;
+            --border-strong: #E0E0DC;
+            --hover: #FBF1F1;
+            --hover-soft: #FAF8F7;
+            --text: #171717;
+            --text-soft: #3F3F3D;
+            --muted: #8B8B86;
+            --muted-soft: #A8A8A3;
+            --accent: #D62828;
+            --accent-dark: #B01F1F;
+            --accent-soft: #FCE8E8;
+            --accent-glow: rgba(214, 40, 40, 0.12);
+            --accent-glow-lg: rgba(214, 40, 40, 0.35);
+            --green: #16794C;
+            --green-soft: #E7F6EE;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --radius: 16px;
+            --shadow-sm: 0 1px 2px rgba(10,10,10,0.04);
+            --shadow-md: 0 6px 24px -6px rgba(10,10,10,0.08);
+            --shadow-lg: 0 12px 32px rgba(15,15,15,0.08), 0 4px 8px rgba(15,15,15,0.04);
+            --shadow-xl: 0 24px 60px rgba(15,15,15,0.14), 0 8px 16px rgba(15,15,15,0.06);
+            --shadow-accent: 0 8px 24px -8px rgba(214, 40, 40, 0.35);
+        }
+
+        * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+        body { font-family: var(--font-body); background: var(--bg); color: var(--text); font-feature-settings: "ss01", "cv11"; }
+        .font-mono { font-family: var(--font-mono); }
+        h1, h2, h3, h4 { font-family: var(--font-body); letter-spacing: -0.025em; }
+        .icon { width: 18px; height: 18px; stroke-width: 1.6; flex-shrink: 0; }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #DDDDD8; border-radius: 10px; border: 3px solid var(--bg); }
+        ::-webkit-scrollbar-thumb:hover { background: #C7C7C1; }
+
+        ::selection { background: var(--accent); color: #fff; }
+
+        /* ══════════════ SIDEBAR ══════════════ */
+        .side-label {
+            font-size: 10.5px; font-weight: 700; letter-spacing: .12em;
+            text-transform: uppercase; color: #C4C4BE; padding: 0 20px; margin: 18px 0 6px;
+        }
+
+        .nav-link { position: relative; border-radius: 12px; color: var(--muted); }
+        .nav-link svg { transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+
+        .nav-link:not(.active):hover { background: var(--hover); color: var(--ink); }
+        .nav-link:not(.active):hover svg { transform: translateX(3px) scale(1.12); color: var(--accent); }
+
+        .nav-link.active {
+            background: linear-gradient(120deg, #E63946 0%, var(--accent) 55%, #B91C1C 100%);
+            color: #fff; font-weight: 600;
+            box-shadow: 0 6px 16px -6px rgba(214,40,40,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+        }
+        .nav-link.active::after {
+            content: ''; position: absolute; right: 12px; top: 50%;
+            width: 6px; height: 6px; border-radius: 50%;
+            background: rgba(255,255,255,0.9); transform: translateY(-50%);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.25);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { box-shadow: 0 0 0 3px rgba(255,255,255,0.25); }
+            50% { box-shadow: 0 0 0 5px rgba(255,255,255,0.12); }
+        }
+
+        details .nav-link { border-radius: 12px; }
+        details[open] > summary.nav-link { color: var(--accent); background: var(--accent-soft); }
+        .submenu { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+        details[open] .submenu { grid-template-rows: 1fr; }
+        .submenu > div { overflow: hidden; }
+        .submenu a { position: relative; transition: color .2s ease, transform .2s ease; }
+        .submenu a::before {
+            content: ''; position: absolute; left: -14px; top: 50%;
+            width: 5px; height: 5px; border-radius: 50%;
+            background: var(--border); transform: translateY(-50%);
+            transition: background .2s ease, transform .2s ease;
+        }
+        .submenu a:hover { color: var(--accent) !important; transform: translateX(4px); }
+        .submenu a:hover::before { background: var(--accent); transform: translateY(-50%) scale(1.4); }
+
+        .logo-badge {
+            position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+        }
+        .logo-badge::after {
+            content: ''; position: absolute; inset: -3px; border-radius: 50%;
+            border: 2px solid var(--accent); opacity: .5; animation: ring 2.2s ease-out infinite;
+        }
+        @keyframes ring { 0% { transform: scale(.6); opacity: .6; } 100% { transform: scale(1.6); opacity: 0; } }
+
+        .logout-btn { transition: all .2s ease; color: var(--muted); border: 1px solid transparent; }
+        .logout-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: #F5D5D5; }
+        .logout-btn:hover svg { transform: translateX(2px); }
+
+        /* ══════════════ TOPBAR ══════════════ */
+        .topbar {
+            position: sticky; top: 0; z-index: 5;
+            backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px);
+            border-bottom: 1px solid var(--border); background: rgba(247,247,245,0.85);
+        }
+
+        .user-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px; color: #fff;
+            background: linear-gradient(135deg, #F26B6B, var(--accent));
+            box-shadow: 0 4px 12px -4px var(--accent-glow), var(--shadow-accent);
+            letter-spacing: -0.02em;
+        }
+
+        /* ══════════════ BOUTONS & CHAMPS ══════════════ */
+        .btn-primary {
+            position: relative;
+            background: linear-gradient(180deg, #E13333 0%, var(--accent) 50%, var(--accent-dark) 100%);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.15) inset, 0 4px 14px rgba(214,40,40,0.28), 0 1px 2px rgba(214,40,40,0.2);
+            transition: all .2s cubic-bezier(0.4, 0, 0.2, 1); letter-spacing: -0.01em;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.15) inset, 0 8px 22px rgba(214,40,40,0.35), 0 2px 4px rgba(214,40,40,0.25);
+            filter: brightness(1.05);
+        }
+        .btn-primary:active { transform: translateY(0); }
+
+        .field-label { font-size: 12.5px; font-weight: 600; color: var(--text-soft); margin-bottom: 7px; display: block; letter-spacing: -0.005em; }
+        .field-input {
+            width: 100%; border: 1px solid var(--border); border-radius: 12px;
+            padding: 11px 14px; font-size: 14.5px; font-family: var(--font-body);
+            background: var(--surface); color: var(--text);
+            transition: all .18s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-sm);
+        }
+        .field-input::placeholder { color: var(--muted-soft); }
+        .field-input:hover { border-color: var(--border-strong); }
+        .field-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow), var(--shadow-sm); }
     </style>
 </head>
 <body class="text-[16px]">
@@ -59,78 +200,116 @@
                 <p class="text-[13px] font-medium mt-1" style="color: var(--muted);">Gestion commerciale</p>
             </div>
         </div>
-        <nav class="flex-1 px-4 py-5 space-y-0.5">
-            <a href="{{ route('dashboard') }}" class="nav-link flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition" style="color: var(--muted);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" /></svg>
-                <span>Dashboard</span>
-            </a>
-            <a href="{{ route('analytics.index') }}" class="nav-link flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition" style="color: var(--muted);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5M4 19h16M8 19v-6M13 19v-9M18 19v-4" />
-                </svg>
-                <span>Analytique</span>
-            </a>
-            <a href="{{ route('clients.index') }}" class="nav-link flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition" style="color: var(--muted);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M11 5.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0ZM22 19v-1a4 4 0 0 0-3-3.87M16 5.63a3.5 3.5 0 0 1 0 6.75" /></svg>
-                <span>Clients</span>
-            </a>
-            <a href="{{ route('fournisseurs.index') }}" class="nav-link flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition" style="color: var(--muted);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 12 3l9 4.5M4 10v9a1 1 0 0 0 1 1h4v-6h6v6h4a1 1 0 0 0 1-1v-9" />
-                </svg>
-                <span>Fournisseurs</span>
-            </a>
-            <a href="{{ route('products.index') }}" class="nav-link flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition" style="color: var(--muted);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8v8a1 1 0 0 1-.5.87l-8 4.5a1 1 0 0 1-1 0l-8-4.5A1 1 0 0 1 3 16V8a1 1 0 0 1 .5-.87l8-4.5a1 1 0 0 1 1 0l8 4.5A1 1 0 0 1 21 8ZM3.3 7.3 12 12l8.7-4.7M12 12v9" /></svg>
-                <span>Produits</span>
-            </a>
-            <a href="{{ route('devis.index') }}" class="nav-link flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition" style="color: var(--muted);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V5a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V3.5Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M9 16h4" />
-                </svg>
-                <span>Devis</span>
-            </a>
-            <a href="{{ route('factures.index') }}" class="nav-link flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition" style="color: var(--muted);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM14 3v5h5M9 13h6M9 16.5h6" />
-                </svg>
-                <span>Factures</span>
-            </a>
-            <a href="{{ route('employees.index') }}" class="nav-link flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition" style="color: var(--muted);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 5 18.5V20M10 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM19 20v-1.2a3 3 0 0 0-2-2.83M15.5 4.2a3 3 0 0 1 0 5.6" /></svg>
-                <span>Employés</span>
-            </a>
-            <a href="{{ route('reports.index') }}" class="nav-link active flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h10a1 1 0 0 1 1 1v16l-6-3-6 3V4a1 1 0 0 1 1-1ZM9 8h6M9 11.5h6" />
-                </svg>
-                <span>Rapports</span>
-            </a>
-            <details class="group">
-                <summary class="nav-link flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition cursor-pointer list-none" style="color: var(--muted);">
+         <nav class="flex-1 px-4 py-4">
+
+            <p class="side-label">Principal</p>
+            <div class="space-y-1">
+
+                <a href="{{ route('dashboard') }}" class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M3 6v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6M3 6l2-3h14l2 3M9 12h6" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
                     </svg>
-                    <span class="flex-1">Gestion financière</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="m9 6 6 6-6 6" />
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="{{ route("analytics.index")}}"  class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5M4 19h16M8 19v-6M13 19v-9M18 19v-4" />
                     </svg>
-                </summary>
-                <div class="pl-11 pr-4 pb-1 space-y-0.5">
-                    <a href="{{ route('finances.index') }}" class="block py-2 text-sm hover:text-[var(--ink)] transition" style="color: var(--muted);">Chiffre d'affaires</a>
-                    <a href="{{ route('credits.index') }}" class="block py-2 text-sm hover:text-[var(--ink)] transition" style="color: var(--muted);">Crédits</a>
-             
-                </div>
-            </details>
-            <a href="{{ route('settings.edit') }}" class="nav-link flex items-center gap-3 pl-4 pr-4 py-3 rounded-r-md text-[15px] font-medium transition" style="color: var(--muted);">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H4a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H10a1.65 1.65 0 0 0 1-1.51V4a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V10a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
-                </svg>
-                <span>Paramètres</span>
-            </a>
+                    <span>Analytique</span>
+                </a>
+
+                <a href="{{ route('clients.index') }}" class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M11 5.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0ZM22 19v-1a4 4 0 0 0-3-3.87M16 5.63a3.5 3.5 0 0 1 0 6.75" />
+                    </svg>
+                    <span>Clients</span>
+                </a>
+
+                <a href="{{ route('fournisseurs.index') }}" class="nav-link  flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition" aria-current="page">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 12 3l9 4.5M4 10v9a1 1 0 0 0 1 1h4v-6h6v6h4a1 1 0 0 0 1-1v-9" />
+                    </svg>
+                    <span>Fournisseurs</span>
+                </a>
+
+            </div>
+
+            <p class="side-label">Gestion</p>
+            <div class="space-y-1">
+
+                <a href="{{ route('products.index') }}" class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8v8a1 1 0 0 1-.5.87l-8 4.5a1 1 0 0 1-1 0l-8-4.5A1 1 0 0 1 3 16V8a1 1 0 0 1 .5-.87l8-4.5a1 1 0 0 1 1 0l8 4.5A1 1 0 0 1 21 8ZM3.3 7.3 12 12l8.7-4.7M12 12v9" />
+                    </svg>
+                    <span>Produits</span>
+                </a>
+
+                <a href="{{ route('devis.index') }}" class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V5a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1V3.5Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M9 16h4" />
+                    </svg>
+                    <span>Devis</span>
+                </a>
+
+                <a href="{{ route('factures.index') }}" class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM14 3v5h5M9 13h6M9 16.5h6" />
+                    </svg>
+                    <span>Factures</span>
+                </a>
+
+                <a href="{{ route('employees.index') }}" class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 5 18.5V20M10 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM19 20v-1.2a3 3 0 0 0-2-2.83M15.5 4.2a3 3 0 0 1 0 5.6" />
+                    </svg>
+                    <span>Employés</span>
+                </a>
+
+                {{-- Gestion financière (sous-menu) --}}
+                <details class="group">
+                    <summary class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition cursor-pointer list-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M3 6v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6M3 6l2-3h14l2 3M9 12h6" />
+                        </svg>
+                        <span class="flex-1">Gestion financière</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="chevron w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="m9 6 6 6-6 6" />
+                        </svg>
+                    </summary>
+
+                    <div class="submenu">
+                        <div class="pl-11 pr-4 pb-1 pt-1 space-y-1">
+                            <a href="{{ route('finances.index') }}" class="block py-2 text-sm" style="color: var(--muted);">Chiffre d'affaires</a>
+                            <a href="{{ route('credits.index') }}" class="block py-2 text-sm" style="color: var(--muted);">Crédits</a>
+                        </div>
+                    </div>
+                </details>
+
+            </div>
+
+            <p class="side-label">Système</p>
+            <div class="space-y-1">
+
+                <a href="{{ route("reports.index")}}" class="nav-link active flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h10a1 1 0 0 1 1 1v16l-6-3-6 3V4a1 1 0 0 1 1-1ZM9 8h6M9 11.5h6" />
+                    </svg>
+                    <span>Rapports</span>
+                </a>
+
+                <a href="{{ route('settings.edit') }}" class="nav-link flex items-center gap-3 px-4 py-3 text-[15px] font-medium transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H4a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H10a1.65 1.65 0 0 0 1-1.51V4a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V10a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+                    </svg>
+                    <span>Paramètres</span>
+                </a>
+
+            </div>
+
         </nav>
         <div class="p-4 border-t" style="border-color: var(--border);">
             <form method="POST" action="{{ route('logout') }}">

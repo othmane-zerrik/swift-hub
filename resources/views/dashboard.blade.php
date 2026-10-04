@@ -417,55 +417,68 @@
             
 
 
-            {{-- STATISTIQUES --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
 
-                {{-- Clients --}}
+                {{-- Stat 1: Clients --}}
                 <div class="stat-card p-6">
                     <div class="flex items-center justify-between">
-                        <p class="text-[15px] font-semibold" style="color: var(--muted);">Clients</p>
+                        <p class="text-[14px] font-semibold text-muted">Clients enregistrés</p>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #F26B6B, #E63946); color: #fff;">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M11 5.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0ZM22 19v-1a4 4 0 0 0-3-3.87M16 5.63a3.5 3.5 0 0 1 0 6.75" />
                             </svg>
                         </div>
                     </div>
-                    <p class="font-mono text-4xl font-bold mt-4" style="color: var(--ink);">{{ $clientsCount ?? 0 }}</p>
-                    <p class="text-sm mt-3" style="color: var(--muted);">
-                        @if(($clientsCount ?? 0) > 0)
-                            {{ $clientsCount }} client{{ $clientsCount > 1 ? 's' : '' }} enregistré{{ $clientsCount > 1 ? 's' : '' }}
-                        @else
-                            Aucun client pour le moment
-                        @endif
+                    <div class="flex items-baseline justify-between mt-4">
+                        <p class="font-mono text-4xl font-bold text-ink">{{ $clientsCount ?? 0 }}</p>
+                        <span class="inline-flex items-center text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                            Actifs
+                        </span>
+                    </div>
+                    <p class="text-xs text-muted mt-3 flex items-center justify-between">
+                        <span>
+                            @if(($clientsCount ?? 0) > 0)
+                                {{ $clientsCount }} client{{ $clientsCount > 1 ? 's' : '' }} au total
+                            @else
+                                Aucun client
+                            @endif
+                        </span>
+                        <a href="{{ route('clients.index') }}" class="text-accent font-semibold hover:underline">Voir la liste →</a>
                     </p>
                 </div>
 
-                {{-- Produits --}}
+                {{-- Stat 2: Produits --}}
                 <div class="stat-card p-6">
                     <div class="flex items-center justify-between">
-                        <p class="text-[15px] font-semibold" style="color: var(--muted);">Produits</p>
+                        <p class="text-[14px] font-semibold text-muted">Produits au catalogue</p>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #E85D5D, #C1272D); color: #fff;">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 8v8a1 1 0 0 1-.5.87l-8 4.5a1 1 0 0 1-1 0l-8-4.5A1 1 0 0 1 3 16V8a1 1 0 0 1 .5-.87l8-4.5a1 1 0 0 1 1 0l8 4.5A1 1 0 0 1 21 8ZM3.3 7.3 12 12l8.7-4.7M12 12v9" />
                             </svg>
                         </div>
                     </div>
-                    <p class="font-mono text-4xl font-bold mt-4" style="color: var(--ink);">
-                        {{ $productsCount ?? 0 }}
-                    </p>
-                    <p class="text-sm mt-3" style="color: var(--muted);">
-                        @if(($productsCount ?? 0) > 0)
-                            {{ $productsCount }} produit{{ $productsCount > 1 ? 's' : '' }} enregistré{{ $productsCount > 1 ? 's' : '' }}
-                        @else
-                            Aucun produit pour le moment
-                        @endif
+                    <div class="flex items-baseline justify-between mt-4">
+                        <p class="font-mono text-4xl font-bold text-ink">{{ $productsCount ?? 0 }}</p>
+                        <span class="inline-flex items-center text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                            En stock
+                        </span>
+                    </div>
+                    <p class="text-xs text-muted mt-3 flex items-center justify-between">
+                        <span>
+                            @if(($productsCount ?? 0) > 0)
+                                {{ $productsCount }} article{{ $productsCount > 1 ? 's' : '' }} référencé{{ $productsCount > 1 ? 's' : '' }}
+                            @else
+                                Aucun produit
+                            @endif
+                        </span>
+                        <a href="{{ route('products.index') }}" class="text-accent font-semibold hover:underline">Gérer stock →</a>
                     </p>
                 </div>
 
-                {{-- Devis --}}
+                {{-- Stat 3: Devis --}}
                 <div class="stat-card p-6">
                     <div class="flex items-center justify-between">
-                        <p class="text-[15px] font-semibold" style="color: var(--muted);">Devis</p>
+                        <p class="text-[14px] font-semibold text-muted">Devis générés</p>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #EF4444, #D62828); color: #fff;">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
@@ -474,33 +487,49 @@
                             </svg>
                         </div>
                     </div>
-                    <p class="font-mono text-4xl font-bold mt-4" style="color: var(--ink);">{{ $devisCount ?? 0 }}</p>
-                    <p class="text-sm mt-3" style="color: var(--muted);">
-                        @if(($devisCount ?? 0) > 0)
-                            {{ $devisCount }} devis créé{{ $devisCount > 1 ? 's' : '' }}
-                        @else
-                            Aucun devis créé
-                        @endif
+                    <div class="flex items-baseline justify-between mt-4">
+                        <p class="font-mono text-4xl font-bold text-ink">{{ $devisCount ?? 0 }}</p>
+                        <span class="inline-flex items-center text-xs font-semibold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
+                            En cours
+                        </span>
+                    </div>
+                    <p class="text-xs text-muted mt-3 flex items-center justify-between">
+                        <span>
+                            @if(($devisCount ?? 0) > 0)
+                                {{ $devisCount }} devis préparé{{ $devisCount > 1 ? 's' : '' }}
+                            @else
+                                Aucun devis
+                            @endif
+                        </span>
+                        <a href="{{ route('devis.index') }}" class="text-accent font-semibold hover:underline">Voir devis →</a>
                     </p>
                 </div>
 
-                {{-- Factures --}}
+                {{-- Stat 4: Factures --}}
                 <div class="stat-card p-6">
                     <div class="flex items-center justify-between">
-                        <p class="text-[15px] font-semibold" style="color: var(--muted);">Factures</p>
+                        <p class="text-[14px] font-semibold text-muted">Factures émises</p>
                         <div class="stat-icon" style="background: linear-gradient(135deg, #B91C1C, #7F1D1D); color: #fff;">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM14 3v5h5M9 13h6M9 16.5h6" />
                             </svg>
                         </div>
                     </div>
-                    <p class="font-mono text-4xl font-bold mt-4" style="color: var(--ink);">{{ $facturesCount ?? 0 }}</p>
-                    <p class="text-sm mt-3" style="color: var(--muted);">
-                        @if(($facturesCount ?? 0) > 0)
-                            {{ $facturesCount }} facture{{ $facturesCount > 1 ? 's' : '' }} créée{{ $facturesCount > 1 ? 's' : '' }}
-                        @else
-                            Aucune facture créée
-                        @endif
+                    <div class="flex items-baseline justify-between mt-4">
+                        <p class="font-mono text-4xl font-bold text-ink">{{ $facturesCount ?? 0 }}</p>
+                        <span class="inline-flex items-center text-xs font-semibold text-accent bg-accent-soft px-2 py-0.5 rounded-full">
+                            Émises
+                        </span>
+                    </div>
+                    <p class="text-xs text-muted mt-3 flex items-center justify-between">
+                        <span>
+                            @if(($facturesCount ?? 0) > 0)
+                                {{ $facturesCount }} facture{{ $facturesCount > 1 ? 's' : '' }} enregistrée{{ $facturesCount > 1 ? 's' : '' }}
+                            @else
+                                Aucune facture
+                            @endif
+                        </span>
+                        <a href="{{ route('factures.index') }}" class="text-accent font-semibold hover:underline">Facturation →</a>
                     </p>
                 </div>
 

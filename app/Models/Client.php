@@ -11,6 +11,7 @@ class Client extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'name',
         'email',
         'phone',
@@ -28,4 +29,8 @@ class Client extends Model
     {
         return $this->hasMany(Facture::class);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }
